@@ -120,7 +120,9 @@ export default function AuthLayout({children, isLoggedIn = false}) {
                             <h3 className="font-semibold mb-4">Connect With Us</h3>
                             <div className="flex space-x-4">
                                 {[Facebook, Twitter, Linkedin, Instagram, Youtube, Video, Mail].map((Icon, index) => (
-                                    <a href="/"
+                                    <a
+                                        key={index}
+                                        href="/"
                                        className="bg-gray-800 p-2 rounded-lg hover:bg-gray-700 transition-colors">
                                         <Icon className="h-5 w-5 text-gray-400 hover:text-white transition-colors"/>
                                     </a>
