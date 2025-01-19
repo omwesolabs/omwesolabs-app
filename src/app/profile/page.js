@@ -2,6 +2,7 @@
 import React, {useState} from 'react';
 import {User, CreditCard, BookOpen, Bell, Edit, ExternalLink, Clock, Download, Bookmark} from 'lucide-react';
 import AuthLayout from "@/components/AuthLayout";
+import {AuthWrapper} from "@/components/AuthWrapper";
 
 export default function ProfilePage() {
     const [activeTab, setActiveTab] = useState('account');
@@ -63,6 +64,7 @@ export default function ProfilePage() {
     );
 
     return (
+        <AuthWrapper>
         <AuthLayout isLoggedIn={true}>
             <div className="min-h-screen bg-gray-50 py-12 px-4">
                 <div className="container mx-auto max-w-6xl">
@@ -191,5 +193,6 @@ export default function ProfilePage() {
                 </div>
             </div>
         </AuthLayout>
+        </AuthWrapper>
     );
 };
