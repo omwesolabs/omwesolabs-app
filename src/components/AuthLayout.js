@@ -24,9 +24,10 @@ export default function AuthLayout({children, isLoggedIn = false}) {
             <a href="/contact" className="text-gray-600 hover:text-blue-600 transition-colors">Contact</a>
             <a href="/login" className="text-gray-600 hover:text-blue-600 transition-colors">
                 Login
-            </a><a href="/signup" className="text-gray-600 hover:text-blue-600 transition-colors">
-            Sign Up
-        </a>
+            </a>
+            {/*<a href="/signup" className="text-gray-600 hover:text-blue-600 transition-colors">*/}
+            {/*    Sign Up*/}
+            {/*</a>*/}
         </>)
 
 
@@ -123,7 +124,7 @@ export default function AuthLayout({children, isLoggedIn = false}) {
                                     <a
                                         key={index}
                                         href="/"
-                                       className="bg-gray-800 p-2 rounded-lg hover:bg-gray-700 transition-colors">
+                                        className="bg-gray-800 p-2 rounded-lg hover:bg-gray-700 transition-colors">
                                         <Icon className="h-5 w-5 text-gray-400 hover:text-white transition-colors"/>
                                     </a>
                                 ))}
