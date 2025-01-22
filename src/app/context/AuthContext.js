@@ -88,7 +88,7 @@ export function AuthProvider({children}){
         // Test Supabase connection
         const testConnection = async () => {
             try {
-                const { data, error } = await supabase.from('user_profiles').select('count', { count: 'exact', head: true });
+                const { data, error } = await supabase.from('profiles').select('count', { count: 'exact', head: true });
                 if (error) throw error;
                 console.log('Supabase connection test successful');
             } catch (err) {
@@ -107,7 +107,7 @@ export function AuthProvider({children}){
     async function fetchUserProfile(userId){
         console.log('Fetching user profile for:', userId);
         try {
-            const {data, error} = await supabase.from('user_profiles')
+            const {data, error} = await supabase.from('profiles')
                 .select('*')
                 .eq('id',userId)
                 .single();
