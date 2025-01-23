@@ -1,29 +1,69 @@
 "use client"
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {
-    Facebook, Linkedin, Twitter, Youtube, GraduationCap, Mail, ArrowRight, VideoIcon, ChevronRight, ChevronDown,BookOpen, Compass, Instagram, Menu, X, Star,Check,AlertCircle
+    Facebook,
+    Linkedin,
+    Twitter,
+    Youtube,
+    GraduationCap,
+    Mail,
+    ArrowRight,
+    VideoIcon,
+    ChevronRight,
+    ChevronDown,
+    BookOpen,
+    Compass,
+    Instagram,
+    Menu,
+    X,
+    Star,
+    Check,
+    AlertCircle
 } from "lucide-react";
 import AuthLayout from "@/components/AuthLayout";
 import SearchableSelect from "@/components/SearchableSelect";
+import {supabase} from "@/lib/supabase";
 
-export default function ComingSoonPage() {
+export default function LandingPage() {
     const [email, setEmail] = useState("");
     const [isSubmitted, setIsSubmitted] = useState(false);
     const handleSubmit = (event) => {
         event.preventDefault();
-        setIsSubmitted(true);
-        //     handle email submission logic here
+
+        console.log(principalSubjects,subsidiarySubjects);
     }
 
     const [principalSubjects, setPrincipalSubjects] = useState(['', '', '']);
     const [subsidiarySubjects, setSubsidiarySubjects] = useState(['', '']);
     const [activeSection, setActiveSection] = useState("hero");
 
-    const subjectOptions = {
-        principal: ['Mathematics', 'Physics', 'Chemistry', 'Biology', 'History', 'Geography', 'Literature', 'Art'],
-        subsidiary: ['Computer Studies', 'General Paper', 'Sub-math']
-    };
+    // const subjectOptions = {
+    //     principal: ['Mathematics', 'Physics', 'Chemistry', 'Biology', 'History', 'Geography', 'Literature', 'Art'],
+    //     subsidiary: ['Computer Studies', 'General Paper', 'Sub-math']
+    // };
 
+    const [subjectOptions, setSubjectOptions] = useState({principal: [], subsidiary: []});
+
+    const fetchSubjects = async () => {
+        try {
+            const {data, error} = await supabase.from("subjects").select();
+            if (error) {
+                throw error
+            }
+            const principalSubjects = data.filter(subject => subject.subject_type === "Principal");
+            const subsidiarySubjects = data.filter(subject => subject.subject_type === "Subsidiary");
+            setSubjectOptions({
+                principal: principalSubjects,
+                subsidiary: subsidiarySubjects,
+            })
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    useEffect(() => {
+        fetchSubjects();
+    }, [])
     return (
         <AuthLayout isLoggedIn={false}>
             <section
@@ -55,7 +95,7 @@ export default function ComingSoonPage() {
                                         className="bg-blue-100 text-blue-600 w-6 h-6 rounded-full flex items-center justify-center mr-2 text-sm">1</span>
                                     Principal Subjects
                                 </h3>
-                                {[0, 1, 2].map((index) => (
+                                {subjectOptions && [0, 1, 2].map((index) => (
                                     <SearchableSelect
                                         key={`principal-${index}`}
                                         value={principalSubjects[index]}
@@ -77,7 +117,7 @@ export default function ComingSoonPage() {
                                         className="bg-blue-100 text-blue-600 w-6 h-6 rounded-full flex items-center justify-center mr-2 text-sm">2</span>
                                     Subsidiary Subjects
                                 </h3>
-                                {[0, 1].map((index) => (
+                                {subjectOptions && [0, 1].map((index) => (
                                     <SearchableSelect
                                         key={`subsidiary-${index}`}
                                         value={subsidiarySubjects[index]}
@@ -94,6 +134,7 @@ export default function ComingSoonPage() {
                             </div>
 
                             <button
+                                onClick={handleSubmit}
                                 className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 rounded-xl font-semibold mt-8 hover:from-blue-700 hover:to-blue-800 transition-all transform hover:scale-[1.02] focus:ring-4 focus:ring-blue-200 flex items-center justify-center space-x-2">
                                 <span>Discover Courses</span>
                                 <ArrowRight className="h-5 w-5"/>

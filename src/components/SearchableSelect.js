@@ -14,7 +14,7 @@ export default function SearchableSelect ({
     const dropdownRef = useRef(null);
 
     const filteredOptions = options.filter(option =>
-        option.toLowerCase().includes(searchTerm.toLowerCase())
+        option.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     useEffect(() => {
@@ -40,8 +40,8 @@ export default function SearchableSelect ({
                 onClick={() => setIsOpen(!isOpen)}
                 className="w-full px-4 py-4 border border-gray-200 rounded-xl bg-white cursor-pointer flex items-center justify-between focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
             >
-        <span className={value ? 'text-gray-900' : 'text-gray-500'}>
-          {value || placeholder}
+        <span className={value.name ? 'text-gray-900' : 'text-gray-500'}>
+          {value.name || placeholder}
         </span>
                 <ChevronDown className="h-5 w-5 text-gray-400 group-hover:text-blue-500 transition-colors" />
             </div>
@@ -67,13 +67,13 @@ export default function SearchableSelect ({
                         ) : (
                             filteredOptions.map((option) => (
                                 <div
-                                    key={option}
+                                    key={option.id}
                                     onClick={() => handleSelect(option)}
                                     className={`px-4 py-2 cursor-pointer hover:bg-blue-50 transition-colors ${
-                                        value === option ? 'bg-blue-50 text-blue-600' : 'text-gray-700'
+                                        value === option.id ? 'bg-blue-50 text-blue-600' : 'text-gray-700'
                                     }`}
                                 >
-                                    {option}
+                                    {option.name}
                                 </div>
                             ))
                         )}
