@@ -3,10 +3,12 @@ import React, {useState} from 'react';
 import {ArrowRight, Phone, Shield} from 'lucide-react';
 import AuthLayout from "@/components/AuthLayout";
 import {AuthWrapper} from "@/components/AuthWrapper";
+import {useAuth} from "@/app/context/AuthContext";
 
 export default function Subscription() {
     const [phoneNumber, setPhoneNumber] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const {user} = useAuth()
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -32,7 +34,7 @@ export default function Subscription() {
 
     return (
         <AuthWrapper>
-            <AuthLayout isLoggedIn={true}>
+            <AuthLayout isLoggedIn={user}>
                 <section className="py-16 px-4">
                     <div className="container mx-auto max-w-2xl">
                         <div className="bg-white rounded-2xl shadow-xl p-8 relative z-10">

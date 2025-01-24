@@ -130,13 +130,18 @@ export function AuthProvider({children}){
     const signInWithGoogle = async ()=>{
         try {
             console.log('Initiating Google sign-in...');
+            const next = new URLSearchParams(window.location.search).get('next');
+            console.log('Sign-in with Google:', next);
             const {error} = await supabase.auth.signInWithOAuth({
                 provider: 'google',
                 options:{
-                    redirectTo: `${window.location.origin}/auth/callback`
+                    // redirectTo: `${window.location.origin}/auth/callback`
+                    redirectTo: next ? `${process.env.NEXT_PUBLIC_SITE_URL}${next}`: `${window.location.origin}/auth/callback`
                 }
             });
-            if(error) throw error;
+            if(error) {
+                throw error
+            };
         } catch(error){
             console.error('Google sign-in error:', error);
             setError(error.message);
@@ -147,8 +152,10 @@ export function AuthProvider({children}){
         try {
             console.log('Signing out...');
             const {error} = await supabase.auth.signOut();
-            if(error) throw error;
-            router.push('/login');
+            if(error) {
+                throw error
+            };
+            router.push('/');
         } catch(error){
             console.error('Sign-out error:', error);
             setError(error.message);

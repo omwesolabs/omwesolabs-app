@@ -1,5 +1,5 @@
 "use client"
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
     BookOpen, GraduationCap, Building2,
     ArrowRight, Star, X, ExternalLink,
@@ -8,15 +8,23 @@ import {
 import AuthLayout from "@/components/AuthLayout";
 import {useSubscription} from "@/app/context/SubscriptionContext";
 import {redirect} from "next/navigation";
+import {useAuth} from "@/app/context/AuthContext";
+import {AuthWrapper} from "@/components/AuthWrapper";
 
 export default function CourseResultsPage() {
     const [selectedCourse, setSelectedCourse] = useState(null);
     const [showFilters, setShowFilters] = useState(false);
+    const {user} = useAuth();
 
     const {subscription, isLoading} = useSubscription();
 
+    useEffect(() => {
+        console.log("User is available: ", user)
+    }, [])
+
     if (isLoading) {
-        return (<div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center">
+        return (
+        <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center">
             <div className="space-y-6 text-center flex items-center justify-center gap-4">
                 <div className="relative w-24 h-24">
                     <div className="w-24 h-24 border-8 border-gray-200 rounded-full"/>
@@ -28,7 +36,8 @@ export default function CourseResultsPage() {
                     <p className="text-sm text-gray-500">Please wait while we get things ready</p>
                 </div>
             </div>
-        </div>)
+        </div>
+        )
     }
     if (!subscription) return redirect('/subscription');
 
@@ -158,106 +167,108 @@ export default function CourseResultsPage() {
     );
 
     return (
-        <AuthLayout isLoggedIn={true}>
-            <div className="min-h-screen bg-gray-50">
-                <main className="container mx-auto max-w-6xl px-4 py-8">
-                    <div className="flex flex-col md:flex-row md:items-center justify-between mb-8">
-                        <div>
-                            <h1 className="text-2xl font-bold mb-2">Recommended Courses</h1>
-                            <p className="text-gray-600">Based on your subject combination</p>
-                        </div>
-                        <button
-                            onClick={() => setShowFilters(!showFilters)}
-                            className="mt-4 md:mt-0 flex items-center space-x-2 px-4 py-2 bg-white rounded-lg border hover:bg-gray-50 transition-colors">
-                            <SlidersHorizontal className="h-5 w-5"/>
-                            <span>Filters</span>
-                        </button>
-                    </div>
-
-                    <div className="flex flex-col lg:flex-row gap-6">
-                        {showFilters && (
-                            <div className="lg:w-64 bg-white p-6 rounded-xl shadow-lg h-fit">
-                                <h2 className="font-semibold mb-4">Your Subjects</h2>
-                                <div className="space-y-4 mb-6">
-                                    <div>
-                                        <h3 className="text-sm text-gray-600 mb-2">Principal Subjects</h3>
-                                        {selectedSubjects.principal.map((subject, index) => (
-                                            <div key={index}
-                                                 className="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm mb-2">
-                                                {subject}
-                                            </div>
-                                        ))}
-                                    </div>
-                                    <div>
-                                        <h3 className="text-sm text-gray-600 mb-2">Subsidiary Subjects</h3>
-                                        {selectedSubjects.subsidiary.map((subject, index) => (
-                                            <div key={index}
-                                                 className="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm mb-2">
-                                                {subject}
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                                {/* Additional filters can be added here */}
+        <AuthWrapper>
+            <AuthLayout isLoggedIn={user}>
+                <div className="min-h-screen bg-gray-50">
+                    <main className="container mx-auto max-w-6xl px-4 py-8">
+                        <div className="flex flex-col md:flex-row md:items-center justify-between mb-8">
+                            <div>
+                                <h1 className="text-2xl font-bold mb-2">Recommended Courses</h1>
+                                <p className="text-gray-600">Based on your subject combination</p>
                             </div>
-                        )}
+                            <button
+                                onClick={() => setShowFilters(!showFilters)}
+                                className="mt-4 md:mt-0 flex items-center space-x-2 px-4 py-2 bg-white rounded-lg border hover:bg-gray-50 transition-colors">
+                                <SlidersHorizontal className="h-5 w-5"/>
+                                <span>Filters</span>
+                            </button>
+                        </div>
 
-                        <div className="flex-1">
-                            <div className="grid md:grid-cols-2 gap-6">
-                                {courses.map((course) => (
-                                    <div key={course.id}
-                                         className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow">
-                                        <div className="p-6">
-                                            <div className="flex justify-between items-start mb-4">
-                                                <h3 className="text-xl font-semibold">{course.name}</h3>
-                                                <div
-                                                    className="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm">
-                                                    {course.matchScore}% Match
+                        <div className="flex flex-col lg:flex-row gap-6">
+                            {showFilters && (
+                                <div className="lg:w-64 bg-white p-6 rounded-xl shadow-lg h-fit">
+                                    <h2 className="font-semibold mb-4">Your Subjects</h2>
+                                    <div className="space-y-4 mb-6">
+                                        <div>
+                                            <h3 className="text-sm text-gray-600 mb-2">Principal Subjects</h3>
+                                            {selectedSubjects.principal.map((subject, index) => (
+                                                <div key={index}
+                                                     className="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm mb-2">
+                                                    {subject}
                                                 </div>
-                                            </div>
-
-                                            <div className="flex items-center text-gray-600 mb-4">
-                                                <Building2 className="h-4 w-4 mr-2"/>
-                                                <span className="text-sm">{course.university}</span>
-                                            </div>
-
-                                            <p className="text-gray-600 mb-6 line-clamp-3">{course.description}</p>
-
-                                            <div className="flex flex-wrap gap-2 mb-6">
-                                                {course.requirements.map((req, index) => (
-                                                    <span key={index}
-                                                          className={`px-3 py-1 rounded-full text-sm ${
-                                                              selectedSubjects.principal.includes(req) ||
-                                                              selectedSubjects.subsidiary.includes(req)
-                                                                  ? 'bg-green-100 text-green-600'
-                                                                  : 'bg-gray-100 text-gray-600'
-                                                          }`}>
-                                                    {req}
-                                                </span>
-                                                ))}
-                                            </div>
-
-                                            <button
-                                                onClick={() => setSelectedCourse(course)}
-                                                className="w-full bg-gray-50 text-blue-600 py-2 rounded-lg font-semibold hover:bg-gray-100 transition-colors flex items-center justify-center space-x-2">
-                                                <span>View Details</span>
-                                                <ArrowRight className="h-4 w-4"/>
-                                            </button>
+                                            ))}
+                                        </div>
+                                        <div>
+                                            <h3 className="text-sm text-gray-600 mb-2">Subsidiary Subjects</h3>
+                                            {selectedSubjects.subsidiary.map((subject, index) => (
+                                                <div key={index}
+                                                     className="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm mb-2">
+                                                    {subject}
+                                                </div>
+                                            ))}
                                         </div>
                                     </div>
-                                ))}
+                                    {/* Additional filters can be added here */}
+                                </div>
+                            )}
+
+                            <div className="flex-1">
+                                <div className="grid md:grid-cols-2 gap-6">
+                                    {courses.map((course) => (
+                                        <div key={course.id}
+                                             className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow">
+                                            <div className="p-6">
+                                                <div className="flex justify-between items-start mb-4">
+                                                    <h3 className="text-xl font-semibold">{course.name}</h3>
+                                                    <div
+                                                        className="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm">
+                                                        {course.matchScore}% Match
+                                                    </div>
+                                                </div>
+
+                                                <div className="flex items-center text-gray-600 mb-4">
+                                                    <Building2 className="h-4 w-4 mr-2"/>
+                                                    <span className="text-sm">{course.university}</span>
+                                                </div>
+
+                                                <p className="text-gray-600 mb-6 line-clamp-3">{course.description}</p>
+
+                                                <div className="flex flex-wrap gap-2 mb-6">
+                                                    {course.requirements.map((req, index) => (
+                                                        <span key={index}
+                                                              className={`px-3 py-1 rounded-full text-sm ${
+                                                                  selectedSubjects.principal.includes(req) ||
+                                                                  selectedSubjects.subsidiary.includes(req)
+                                                                      ? 'bg-green-100 text-green-600'
+                                                                      : 'bg-gray-100 text-gray-600'
+                                                              }`}>
+                                                    {req}
+                                                </span>
+                                                    ))}
+                                                </div>
+
+                                                <button
+                                                    onClick={() => setSelectedCourse(course)}
+                                                    className="w-full bg-gray-50 text-blue-600 py-2 rounded-lg font-semibold hover:bg-gray-100 transition-colors flex items-center justify-center space-x-2">
+                                                    <span>View Details</span>
+                                                    <ArrowRight className="h-4 w-4"/>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </main>
+                    </main>
 
-                {selectedCourse && (
-                    <CourseModal
-                        course={selectedCourse}
-                        onClose={() => setSelectedCourse(null)}
-                    />
-                )}
-            </div>
-        </AuthLayout>
+                    {selectedCourse && (
+                        <CourseModal
+                            course={selectedCourse}
+                            onClose={() => setSelectedCourse(null)}
+                        />
+                    )}
+                </div>
+            </AuthLayout>
+        </AuthWrapper>
     );
 }

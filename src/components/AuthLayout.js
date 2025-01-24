@@ -1,9 +1,11 @@
 "use client"
 import React, {useState} from "react";
 import {GraduationCap, Menu, X, Facebook, Twitter, Instagram, Mail, Linkedin, Youtube, Video} from "lucide-react"
+import {useAuth} from "@/app/context/AuthContext";
 
 export default function AuthLayout({children, isLoggedIn = false}) {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const {signOut} = useAuth()
 
     const LoggedInNav = () =>
         (<>
@@ -11,7 +13,7 @@ export default function AuthLayout({children, isLoggedIn = false}) {
             <a href="/courses" className="text-gray-600 hover:hover:text-blue-600 transition-colors">My Courses</a>
             <a href="/profile" className="text-gray-600 hover:hover:text-blue-600 transition-colors">Profile</a>
             <button
-                onClick={() => console.log(isLoggedIn)}
+                onClick={signOut}
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
                 Logout
             </button>

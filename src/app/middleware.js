@@ -11,6 +11,7 @@ export async function middleware(req) {
     if (!session && !isPublicPath) {
         const redirectUrl = new URL("/login", req.url)
         redirectUrl.searchParams.set('redirectTo', req.nextUrl.pathname)
+        console.log(redirectUrl)
         return NextResponse.redirect(redirectUrl)
     }
     return res

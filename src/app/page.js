@@ -23,14 +23,18 @@ import {
 import AuthLayout from "@/components/AuthLayout";
 import SearchableSelect from "@/components/SearchableSelect";
 import {supabase} from "@/lib/supabase";
+import {redirect} from "next/navigation";
+import {useAuth} from "@/app/context/AuthContext";
 
 export default function LandingPage() {
     const [email, setEmail] = useState("");
     const [isSubmitted, setIsSubmitted] = useState(false);
     const handleSubmit = (event) => {
         event.preventDefault();
-
-        console.log(principalSubjects,subsidiarySubjects);
+        const searchParams = {"principals": principalSubjects, "subsidiaries": setSubsidiarySubjects}
+        localStorage.setItem("search", JSON.stringify(searchParams));
+        console.log(localStorage.getItem("search"));
+        redirect("/courses")
     }
 
     const [principalSubjects, setPrincipalSubjects] = useState(['', '', '']);
@@ -60,12 +64,12 @@ export default function LandingPage() {
             console.error(error);
         }
     }
-
+    const {user} = useAuth()
     useEffect(() => {
         fetchSubjects();
     }, [])
     return (
-        <AuthLayout isLoggedIn={false}>
+        <AuthLayout isLoggedIn={user}>
             <section
                 className="relative bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 text-white py-32 px-4 overflow-hidden">
                 <div

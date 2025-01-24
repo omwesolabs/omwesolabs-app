@@ -3,6 +3,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import {useAuth} from "@/app/context/AuthContext";
+import {redirect} from "next/navigation";
 
 const SubscriptionContext = createContext();
 
@@ -15,14 +16,19 @@ export function SubscriptionProvider({ children }) {
 
     const checkSubscription = async () => {
         try {
+            if (!user){
+                redirect("/login")
+            }
             setIsLoading(true);
             const { data, error } = await supabase
                 .from('active_subscriptions')
                 .select('*')
                 .eq('user_id', user?.id)
                 .single();
-
-            if (error) throw error;
+            console.log('data', data);
+            if (error) {
+                throw error
+            };
             setSubscription(data);
         } catch (err) {
             setError(err);
