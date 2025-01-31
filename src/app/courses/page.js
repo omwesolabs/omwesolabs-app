@@ -20,6 +20,9 @@ export default function CourseResultsPage() {
 
     useEffect(() => {
         console.log("User is available: ", user)
+        if (!user){
+            redirect("/login");
+        }
     }, [])
 
     if (isLoading) {
@@ -39,7 +42,8 @@ export default function CourseResultsPage() {
         </div>
         )
     }
-    if (!subscription) return redirect('/subscription');
+    const currentPath = window.location.pathname
+    if (!subscription) return redirect(`/subscription?next=${currentPath}`);
 
     // Sample data based on the subjects selected from previous page
     const selectedSubjects = {
