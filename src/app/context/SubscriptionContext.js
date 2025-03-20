@@ -20,16 +20,37 @@ export function SubscriptionProvider({ children }) {
                 redirect("/login")
             }
             setIsLoading(true);
-            const { data, error } = await supabase
-                .from('active_subscriptions')
+
+            let { data: user_subscriptions, error } = await supabase
+                .from('user_subscriptions')
                 .select('*')
-                .eq('user_id', user?.id)
-                .single();
-            console.log('data', data);
+                .eq('user_id', user.id)
+                .maybeSingle();
+            console.log('user_subscriptions: ', user_subscriptions);
             if (error) {
-                throw error
-            };
-            setSubscription(data);
+                console.log('error', error);
+            }
+            // Check if subscription exists before processing it
+            if (user_subscriptions) {
+                // Convert the end_date string to a Date object for comparison
+                // (Assuming end_date is stored as a timestamp or ISO string in the database)
+                const endDate = new Date(user_subscriptions.end_date);
+                const currentDate = new Date();
+
+                if (endDate > currentDate) {
+                    // Subscription is active
+                    console.log('Active subscription found, expires:', endDate);
+                    setSubscription(user_subscriptions);
+                } else {
+                    // Subscription has expired
+                    console.log('Subscription expired on:', endDate);
+                    setSubscription({ ...user_subscriptions, status: 'expired' });
+                }
+            } else {
+                // No subscription found
+                console.log('No subscription found for user');
+                setSubscription(null);
+            }
         } catch (err) {
             setError(err);
         } finally {

@@ -3,18 +3,19 @@ import React, {useEffect} from 'react';
 import {CheckCircle, Download, ArrowRight, FileText} from 'lucide-react';
 import AuthLayout from "@/components/AuthLayout";
 import {AuthWrapper} from "@/components/AuthWrapper";
-import {useRouter} from "next/navigation";
+import {useRouter, useSearchParams} from "next/navigation";
 
 export default function PaymentSuccess() {
     const router = useRouter();
-    const {transactionId} = router.query
+    const searchParams = useSearchParams();
+    const transactionId = searchParams.get('transactionId');
     useEffect(() => {
         if (!transactionId) {
             return
         }
         const checkPaymentStatus = async () => {
             try {
-                const response = await fetch('/api/momo/confirmPayment?transactionId=' + transactionId);
+                const response = await fetch('/api/momo/confirm-payment?transactionId=' + transactionId);
                 const result = await response.json();
                 if (result.status === 'SUCCESSFUL') {
 

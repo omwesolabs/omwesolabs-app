@@ -28,10 +28,12 @@ import {useAuth} from "@/app/context/AuthContext";
 
 export default function LandingPage() {
     const [email, setEmail] = useState("");
-    const [isSubmitted, setIsSubmitted] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const handleSubmit = (event) => {
         event.preventDefault();
-        const searchParams = {"principals": principalSubjects, "subsidiaries": setSubsidiarySubjects}
+        setIsSubmitting(true)
+        const searchParams = {"principals": principalSubjects, "subsidiaries": subsidiarySubjects}
+        console.log(searchParams)
         localStorage.setItem("search", JSON.stringify(searchParams));
         console.log(localStorage.getItem("search"));
         redirect("/courses")
@@ -50,7 +52,7 @@ export default function LandingPage() {
 
     const fetchSubjects = async () => {
         try {
-            const {data, error} = await supabase.from("subjects").select();
+            const {data, error} = await supabase.from("subjects").select('id, name, subject_type');
             if (error) {
                 throw error
             }
@@ -99,20 +101,25 @@ export default function LandingPage() {
                                         className="bg-blue-100 text-blue-600 w-6 h-6 rounded-full flex items-center justify-center mr-2 text-sm">1</span>
                                     Principal Subjects
                                 </h3>
-                                {subjectOptions && [0, 1, 2].map((index) => (
-                                    <SearchableSelect
-                                        key={`principal-${index}`}
+                                {subjectOptions && [0, 1, 2].map((index) => {
+                                    const filteredOptions = subjectOptions.principal.filter(option => !principalSubjects.includes(option) || principalSubjects[index] === option)
+                                    return (< SearchableSelect
+                                        key={`principal-${index}`
+                                        }
                                         value={principalSubjects[index]}
                                         onChange={(value) => {
                                             const newSubjects = [...principalSubjects];
                                             newSubjects[index] = value;
                                             setPrincipalSubjects(newSubjects);
-                                        }}
-                                        options={subjectOptions.principal}
-                                        placeholder={`Select Subject ${index + 1}`}
-                                        name={`principal-${index}`}
-                                    />
-                                ))}
+                                        }
+                                        }
+                                        options={filteredOptions}
+                                        placeholder={`Select Subject ${index + 1}`
+                                        }
+                                        name={`principal-${index}`
+                                        }
+                                    />)
+                                })}
                             </div>
 
                             <div className="space-y-4">
@@ -121,8 +128,9 @@ export default function LandingPage() {
                                         className="bg-blue-100 text-blue-600 w-6 h-6 rounded-full flex items-center justify-center mr-2 text-sm">2</span>
                                     Subsidiary Subjects
                                 </h3>
-                                {subjectOptions && [0, 1].map((index) => (
-                                    <SearchableSelect
+                                {subjectOptions && [0, 1].map((index) => {
+                                    const filteredOptions = subjectOptions.subsidiary.filter(option => !subsidiarySubjects.includes(option) || subsidiarySubjects[index] === option)
+                                    return (<SearchableSelect
                                         key={`subsidiary-${index}`}
                                         value={subsidiarySubjects[index]}
                                         onChange={(value) => {
@@ -130,17 +138,19 @@ export default function LandingPage() {
                                             newSubjects[index] = value;
                                             setSubsidiarySubjects(newSubjects);
                                         }}
-                                        options={subjectOptions.subsidiary}
+                                        options={filteredOptions}
                                         placeholder={`Select Subject ${index + 1}`}
                                         name={`subsidiary-${index}`}
-                                    />
-                                ))}
+                                    />)
+                                })}
                             </div>
 
                             <button
                                 onClick={handleSubmit}
                                 className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 rounded-xl font-semibold mt-8 hover:from-blue-700 hover:to-blue-800 transition-all transform hover:scale-[1.02] focus:ring-4 focus:ring-blue-200 flex items-center justify-center space-x-2">
-                                <span>Discover Courses</span>
+                                <span>{
+                                    isSubmitting ? "Please wait...":"Discover Courses"
+                                }</span>
                                 <ArrowRight className="h-5 w-5"/>
                             </button>
                         </div>

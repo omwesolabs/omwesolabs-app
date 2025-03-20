@@ -5,6 +5,8 @@ import AuthLayout from "@/components/AuthLayout";
 import {AuthWrapper} from "@/components/AuthWrapper";
 import {useAuth} from "@/app/context/AuthContext";
 import {useRouter} from "next/navigation";
+import {supabase} from "@/lib/supabase";
+import {v4 as uuidv4} from "uuid";
 
 export default function Subscription() {
     const [phoneNumber, setPhoneNumber] = useState('');
@@ -15,19 +17,70 @@ export default function Subscription() {
     const {user} = useAuth()
     const router = useRouter()
 
+    const [voucherCode, setVoucherCode] = useState('')
+    const handleApplyVoucher = async (e) => {
+        let {data, error} = await supabase
+            .rpc('validate_voucher', {
+                plan: null,
+                user_id: user.id,
+                voucher_code: voucherCode,
+            })
+
+        if (error) {
+            console.log(error)
+        } else if (data.valid) {
+            console.log(data)
+        } else {
+            console.log(data)
+        }
+    }
+
+    const handlePayment = async (e) => {
+        e.preventDefault()
+        setIsLoading(true);
+        if (voucherCode) {
+
+            let { data, error } = await supabase
+                .rpc('validate_voucher', {
+                    plan: null,
+                    user_id: user.id,
+                    voucher_code: voucherCode,
+                })
+            if (error) {
+                setIsLoading(false);
+                console.log(error)
+            } else {
+                if (data[0].valid) {
+                    console.log(user.id,voucherCode)
+                    const {data,error} = await supabase.rpc('apply_voucher', {
+                        p_plan_id: null,
+                        p_user_id: user.id,
+                        voucher_code: voucherCode,
+                    })
+                    if (error) {
+                        setIsLoading(false);
+                        console.log(error)
+                    }
+                    console.log(data)
+                }
+            }
+        }
+    }
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsLoading(true);
         try {
-            const transactionId = `TXN_${Date.now()}`;
-            const response = await fetch('/api/momo/initiate', {
+            // const transactionId = `TXN_${Date.now()}`;
+            const transactionId = uuidv4();
+            const response = await fetch('/api/momo/initiate-payment', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({phoneNumber, amount: 10000, transactionId})
             })
             const result = await response.json()
             if (result.success) {
-                router.push("/receipt?transactionId=" + transactionId);
+                router.push("/subscription/receipt?transactionId=" + transactionId);
             } else {
                 //     TODO: Show notification
             }
@@ -61,7 +114,7 @@ export default function Subscription() {
                     <div className="container mx-auto max-w-2xl">
                         <div className="bg-white rounded-2xl shadow-xl p-8 relative z-10">
                             <h2 className="text-2xl font-bold text-center mb-8">Complete Your Payment</h2>
-                            <p className="text-center mb-8 text-gray-600">{`Enter your ${isMobilePayment ? 'mobile money' : 'voucher'} number to proceed${isMobilePayment && 'with payment'}`}</p>
+                            <p className="text-center mb-8 text-gray-600">{`Enter your ${isMobilePayment ? 'mobile money' : 'voucher'} number to proceed${ isMobilePayment ? 'with payment' : ''}`}</p>
 
                             {isMobilePayment && (<form onSubmit={handleSubmit} className="space-y-6">
                                 <div className="space-y-4">
@@ -133,11 +186,11 @@ export default function Subscription() {
 
                             {/*Voucher Redemption */}
                             {
-                                !isMobilePayment && (<form onSubmit={handleSubmit} className="space-y-6">
+                                !isMobilePayment && (<form className="space-y-6">
                                     <div className="space-y-4">
                                         <div className="relative">
                                             <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
-                                                Voucher Number
+                                                Voucher
                                             </label>
                                             <div className="relative">
                                                 <Ticket
@@ -145,8 +198,9 @@ export default function Subscription() {
                                                 <input
                                                     type="text"
                                                     id="voucher"
-                                                    value={voucherNumber}
-                                                    onChange={handlePhoneChange}
+                                                    value={voucherCode}
+                                                    onChange={(e) => setVoucherCode(e.target.value)}
+                                                    onBlur={() => handleApplyVoucher(voucherCode)}
                                                     placeholder="OMW-23X5Y"
                                                     className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-600 transition-all"
                                                     required
@@ -157,8 +211,8 @@ export default function Subscription() {
                                     </div>
 
                                     <button
-                                        type="submit"
-                                        disabled={isLoading || phoneNumber.length < 12}
+                                        onClick={handlePayment}
+                                        disabled={isLoading || voucherCode.length < 8}
                                         className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 rounded-xl font-semibold hover:from-blue-700 hover:to-blue-800 transition-all transform hover:scale-[1.02] focus:ring-4 focus:ring-blue-200 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
                                         {isLoading ? (
