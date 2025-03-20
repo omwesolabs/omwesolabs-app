@@ -1,15 +1,17 @@
 "use client"
-import React, {Suspense, useEffect} from 'react';
-import {CheckCircle, Download, ArrowRight, FileText} from 'lucide-react';
+import React, {Suspense} from 'react';
+import {CheckCircle, ArrowRight, FileText} from 'lucide-react';
 import AuthLayout from "@/components/AuthLayout";
 import {AuthWrapper} from "@/components/AuthWrapper";
-import {useRouter, useSearchParams} from "next/navigation";
+import {useRouter} from "next/navigation";
 
-export default function PaymentSuccess() {
-    const router = useRouter();
+// Separate component that uses useSearchParams
+const PaymentContent = () => {
+    const {useSearchParams} = require("next/navigation");
     const searchParams = useSearchParams();
     const transactionId = searchParams.get('transactionId');
-    useEffect(() => {
+
+    React.useEffect(() => {
         if (!transactionId) {
             return
         }
@@ -30,6 +32,7 @@ export default function PaymentSuccess() {
         }
         checkPaymentStatus();
     }, [transactionId]);
+
     const transactionDetails = {
         transactionId: "TXN" + Math.random().toString(36).substr(2, 9).toUpperCase(),
         date: new Date().toLocaleString('en-US', {
@@ -71,6 +74,58 @@ Thank you for your payment!
     };
 
     return (
+        <>
+            {/* Success Message */}
+            <h2 className="text-2xl font-bold text-center mb-4">Payment Successful!</h2>
+            <p className="text-center mb-8 text-gray-600">
+                Your payment has been processed successfully. You can now access all Basic Plan
+                features.
+            </p>
+
+            {/* Transaction Details */}
+            <div className="bg-gray-50 rounded-xl p-6 mb-8 space-y-3">
+                <div className="flex justify-between items-center text-sm">
+                    <span className="text-gray-600">Transaction ID</span>
+                    <span className="font-medium">{transactionDetails.transactionId}</span>
+                </div>
+                <div className="flex justify-between items-center text-sm">
+                    <span className="text-gray-600">Date</span>
+                    <span className="font-medium">{transactionDetails.date}</span>
+                </div>
+                <div className="flex justify-between items-center text-sm">
+                    <span className="text-gray-600">Amount</span>
+                    <span className="font-medium">{transactionDetails.amount}</span>
+                </div>
+                <div className="flex justify-between items-center text-sm">
+                    <span className="text-gray-600">Phone Number</span>
+                    <span className="font-medium">{transactionDetails.phoneNumber}</span>
+                </div>
+            </div>
+
+            {/* Download Receipt Button */}
+            <button
+                onClick={handleDownloadReceipt}
+                className="w-full bg-white border-2 border-blue-600 text-blue-600 py-4 rounded-xl font-semibold hover:bg-blue-50 transition-all mb-4 flex items-center justify-center space-x-2"
+            >
+                <FileText className="h-5 w-5"/>
+                <span>Download Receipt</span>
+            </button>
+
+            {/* Continue Button */}
+            <button
+                className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 rounded-xl font-semibold hover:from-blue-700 hover:to-blue-800 transition-all transform hover:scale-[1.02] focus:ring-4 focus:ring-blue-200 flex items-center justify-center space-x-2"
+            >
+                <span>Continue to Dashboard</span>
+                <ArrowRight className="h-5 w-5"/>
+            </button>
+        </>
+    );
+};
+
+export default function PaymentSuccess() {
+    const router = useRouter();
+
+    return (
         <AuthWrapper>
             <AuthLayout isLoggedIn={true}>
                 <section className="py-16 px-4">
@@ -84,49 +139,7 @@ Thank you for your payment!
                             </div>
 
                             <Suspense fallback={<div>Loading...</div>}>
-                                {/* Success Message */}
-                                <h2 className="text-2xl font-bold text-center mb-4">Payment Successful!</h2>
-                                <p className="text-center mb-8 text-gray-600">
-                                    Your payment has been processed successfully. You can now access all Basic Plan
-                                    features.
-                                </p>
-
-                                {/* Transaction Details */}
-                                <div className="bg-gray-50 rounded-xl p-6 mb-8 space-y-3">
-                                    <div className="flex justify-between items-center text-sm">
-                                        <span className="text-gray-600">Transaction ID</span>
-                                        <span className="font-medium">{transactionDetails.transactionId}</span>
-                                    </div>
-                                    <div className="flex justify-between items-center text-sm">
-                                        <span className="text-gray-600">Date</span>
-                                        <span className="font-medium">{transactionDetails.date}</span>
-                                    </div>
-                                    <div className="flex justify-between items-center text-sm">
-                                        <span className="text-gray-600">Amount</span>
-                                        <span className="font-medium">{transactionDetails.amount}</span>
-                                    </div>
-                                    <div className="flex justify-between items-center text-sm">
-                                        <span className="text-gray-600">Phone Number</span>
-                                        <span className="font-medium">{transactionDetails.phoneNumber}</span>
-                                    </div>
-                                </div>
-
-                                {/* Download Receipt Button */}
-                                <button
-                                    onClick={handleDownloadReceipt}
-                                    className="w-full bg-white border-2 border-blue-600 text-blue-600 py-4 rounded-xl font-semibold hover:bg-blue-50 transition-all mb-4 flex items-center justify-center space-x-2"
-                                >
-                                    <FileText className="h-5 w-5"/>
-                                    <span>Download Receipt</span>
-                                </button>
-
-                                {/* Continue Button */}
-                                <button
-                                    className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 rounded-xl font-semibold hover:from-blue-700 hover:to-blue-800 transition-all transform hover:scale-[1.02] focus:ring-4 focus:ring-blue-200 flex items-center justify-center space-x-2"
-                                >
-                                    <span>Continue to Dashboard</span>
-                                    <ArrowRight className="h-5 w-5"/>
-                                </button>
+                                <PaymentContent />
                             </Suspense>
 
                             {/* Support Info */}
@@ -139,4 +152,4 @@ Thank you for your payment!
             </AuthLayout>
         </AuthWrapper>
     );
-};
+}
