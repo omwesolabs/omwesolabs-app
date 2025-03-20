@@ -1,5 +1,5 @@
 "use client"
-import React, {useEffect} from 'react';
+import React, {Suspense, useEffect} from 'react';
 import {CheckCircle, Download, ArrowRight, FileText} from 'lucide-react';
 import AuthLayout from "@/components/AuthLayout";
 import {AuthWrapper} from "@/components/AuthWrapper";
@@ -71,6 +71,7 @@ Thank you for your payment!
     };
 
     return (
+        <Suspense fallback={<div>Loading...</div>}>
         <AuthWrapper>
             <AuthLayout isLoggedIn={true}>
                 <section className="py-16 px-4">
@@ -136,5 +137,6 @@ Thank you for your payment!
                 </section>
             </AuthLayout>
         </AuthWrapper>
+        </Suspense>
     );
 };
